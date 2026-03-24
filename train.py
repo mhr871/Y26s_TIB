@@ -17,12 +17,36 @@ def in_colab() -> bool:
     return drive is not None
 
 
+def drive_is_mounted() -> bool:
+    return Path("/content/drive/MyDrive").exists()
+
+
+def can_mount_drive_in_this_process() -> bool:
+    if not in_colab():
+        return False
+    try:
+        from IPython import get_ipython
+        ip = get_ipython()
+    except Exception:
+        return False
+    return bool(ip and getattr(ip, "kernel", None))
+
+
 def mount_drive_if_needed() -> None:
     if not in_colab():
         return
-    if Path("/content/drive").exists() and any(Path("/content/drive").iterdir()):
+    if drive_is_mounted():
         return
+    if not can_mount_drive_in_this_process():
+        raise RuntimeError(
+            "Google Drive bu '!python train.py' subprocess'i icinden mount edilemez.\n"
+            "Colab'da once su komutu calistirin:\n"
+            "from google.colab import drive; drive.mount('/content/drive')\n"
+            "Ardindan tekrar '!python train.py' calistirin."
+        )
     drive.mount("/content/drive")
+    if not drive_is_mounted():
+        raise RuntimeError("Google Drive mount tamamlanamadi.")
 
 
 def extract_dataset() -> Path:
