@@ -49,15 +49,43 @@ def mount_drive_if_needed() -> None:
         raise RuntimeError("Google Drive mount tamamlanamadi.")
 
 
+def find_dataset_root(search_root: Path) -> Path | None:
+    direct_yaml = search_root / "data.yaml"
+    if direct_yaml.exists():
+        return search_root
+    tib_yaml = search_root / "TIB_dataset" / "data.yaml"
+    if tib_yaml.exists():
+        return tib_yaml.parent
+    return None
+
+
+def resolve_zip_candidates() -> list[Path]:
+    repo_root = Path(__file__).resolve().parent
+    configured = [Path(CFG.DRIVE_ZIP_PATH)]
+    configured.extend(Path(path) for path in getattr(CFG, "DATASET_ZIP_FALLBACKS", ()))
+    configured.extend([
+        repo_root / "TIB_dataset.zip",
+        repo_root.parent / "TIB_dataset.zip",
+    ])
+
+    seen: set[str] = set()
+    result: list[Path] = []
+    for path in configured:
+        key = str(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(path)
+    return result
+
+
 def extract_dataset() -> Path:
     dataset_root = Path(CFG.LOCAL_DATASET_PATH)
-    if (dataset_root / "data.yaml").exists():
-        return dataset_root
+    existing_root = find_dataset_root(dataset_root)
+    if existing_root is not None:
+        return existing_root
 
-    zip_candidates = [
-        Path(CFG.DRIVE_ZIP_PATH),
-        Path(__file__).resolve().parent / "TIB_dataset.zip",
-    ]
+    zip_candidates = resolve_zip_candidates()
     zip_path = next((path for path in zip_candidates if path.exists()), None)
     if zip_path is None:
         checked = "\n".join(str(path) for path in zip_candidates)
@@ -66,9 +94,14 @@ def extract_dataset() -> Path:
     dataset_root.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zip_path, "r") as archive:
         archive.extractall(dataset_root.parent)
-    if not (dataset_root / "data.yaml").exists():
-        raise FileNotFoundError(f"Zip acildi ama data.yaml bulunamadi: {dataset_root / 'data.yaml'}")
-    return dataset_root
+    extracted_root = find_dataset_root(dataset_root.parent)
+    if extracted_root is None:
+        raise FileNotFoundError(
+            "Zip acildi ama data.yaml bulunamadi. Beklenen konumlar:\n"
+            f"{dataset_root / 'data.yaml'}\n"
+            f"{dataset_root.parent / 'data.yaml'}"
+        )
+    return extracted_root
 
 
 def resolve_data_yaml(dataset_root: Path) -> str:

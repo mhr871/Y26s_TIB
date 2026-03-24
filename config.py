@@ -2,11 +2,16 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent
 
-DRIVE_ZIP_PATH = "/content/drive/MyDrive/TIB_dataset.zip"
+DRIVE_ZIP_PATH = "/content/drive/MyDrive/YOLO/datasets/TIB_dataset.zip"
 LOCAL_DATASET_PATH = "/content/TIB_dataset"
 DRIVE_OUTPUT_PATH = "/content/drive/MyDrive/yolo_runs"
 DRIVE_MODEL_DIR = "/content/drive/MyDrive/ultralytics_models"
 LOCAL_MODEL_DIR = "/content/ultralytics_models"
+DATASET_ZIP_FALLBACKS = (
+    "/content/drive/MyDrive/TIB_dataset.zip",
+    "/content/drive/MyDrive/datasets/TIB_dataset.zip",
+    "/content/drive/MyDrive/YOLO/TIB_dataset.zip",
+)
 
 # Resmi Ultralytics model adini ver. Ilk calismada indirilir, Drive'a kaydedilir,
 # sonraki calismalarda ayni dosya tekrar kullanilir.
