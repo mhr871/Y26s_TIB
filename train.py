@@ -4,6 +4,7 @@ import zipfile
 from pathlib import Path
 
 from ultralytics import YOLO
+import yaml
 
 import config as CFG
 
@@ -108,7 +109,37 @@ def resolve_data_yaml(dataset_root: Path) -> str:
     data_yaml = dataset_root / "data.yaml"
     if not data_yaml.exists():
         raise FileNotFoundError(f"data.yaml bulunamadi: {data_yaml}")
-    return str(data_yaml)
+
+    with open(data_yaml, "r", encoding="utf-8") as handle:
+        raw_cfg = yaml.safe_load(handle) or {}
+
+    names = raw_cfg.get("names", {0: "UAV"})
+    if isinstance(names, list):
+        nc = raw_cfg.get("nc", len(names))
+    elif isinstance(names, dict):
+        nc = raw_cfg.get("nc", len(names))
+    else:
+        names = {0: "UAV"}
+        nc = 1
+
+    normalized_cfg = {
+        "path": str(dataset_root),
+        "train": "images/train",
+        "val": "images/val",
+        "test": "images/test",
+        "nc": nc,
+        "names": names,
+    }
+
+    for split in ("train", "val", "test"):
+        split_dir = dataset_root / "images" / split
+        if not split_dir.exists():
+            raise FileNotFoundError(f"Dataset klasoru eksik: {split_dir}")
+
+    runtime_yaml = dataset_root / "data.runtime.yaml"
+    with open(runtime_yaml, "w", encoding="utf-8") as handle:
+        yaml.safe_dump(normalized_cfg, handle, sort_keys=False, allow_unicode=True)
+    return str(runtime_yaml)
 
 
 def unique_paths(paths: list[Path]) -> list[Path]:
