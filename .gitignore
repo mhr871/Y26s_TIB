@@ -1,0 +1,8 @@
+TIB_dataset/images/
+TIB_dataset/labels/
+TIB_dataset.zip
+1.py
+*.pt
+runs/
+__pycache__/
+*.pyc
