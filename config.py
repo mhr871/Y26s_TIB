@@ -1,4 +1,5 @@
-DRIVE_DATASET_PATH = "/content/drive/MyDrive/TIB_dataset"
+DRIVE_ZIP_PATH     = "/content/drive/MyDrive/TIB_dataset.zip"
+LOCAL_DATASET_PATH = "/content/TIB_dataset"
 DRIVE_OUTPUT_PATH  = "/content/drive/MyDrive/yolo_runs"
 
 MODEL      = "yolov8s.pt"

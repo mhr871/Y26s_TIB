@@ -1,4 +1,5 @@
 import os
+import zipfile
 import yaml
 from google.colab import drive
 from ultralytics import YOLO
@@ -8,6 +9,12 @@ import config as CFG
 
 def mount_drive():
     drive.mount("/content/drive")
+
+
+def extract_dataset():
+    if not os.path.exists(CFG.LOCAL_DATASET_PATH):
+        with zipfile.ZipFile(CFG.DRIVE_ZIP_PATH, "r") as z:
+            z.extractall("/content")
 
 
 def build_yaml(dataset_path, output_path="/content/data.yaml"):
@@ -26,10 +33,11 @@ def build_yaml(dataset_path, output_path="/content/data.yaml"):
 
 def main():
     mount_drive()
+    extract_dataset()
 
     os.makedirs(CFG.PROJECT, exist_ok=True)
 
-    data_yaml = build_yaml(CFG.DRIVE_DATASET_PATH)
+    data_yaml = build_yaml(CFG.LOCAL_DATASET_PATH)
 
     model = YOLO(CFG.MODEL)
 
