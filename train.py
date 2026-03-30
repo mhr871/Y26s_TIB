@@ -161,6 +161,13 @@ def resolve_dataset_base(raw_cfg: dict, dataset_root: Path) -> Path:
     if not configured_base:
         return dataset_root.resolve()
 
+    # Windows mutlak yolu (orn. "C:/...") Linux'ta is_absolute()=False doner
+    # ve dataset_root ile birlestirilince bozuk yol olusur. Bu durumda
+    # dataset_root'u kullan.
+    import re
+    if re.match(r"^[A-Za-z]:[/\\]", str(configured_base)):
+        return dataset_root.resolve()
+
     base_path = expand_path(configured_base)
     if not base_path.is_absolute():
         base_path = (dataset_root / base_path).resolve()
