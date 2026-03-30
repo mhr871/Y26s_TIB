@@ -8,10 +8,9 @@ DRIVE_ZIP_PATH = "/content/drive/MyDrive/YOLO/datasets/9050_3_Mdataset.zip"
 LOCAL_DATASET_PATH = str(REPO_ROOT / DATASET_NAME)
 DATASET_SEARCH_ROOTS = (
     LOCAL_DATASET_PATH,
-    str(REPO_ROOT / "TIB_dataset"),
     str(REPO_ROOT.parent / DATASET_NAME),
-    "/content/dataset",
     "/content/9050_3_Mdataset",
+    "/content/dataset",
 )
 DATASET_ZIP_FALLBACKS = (
     DRIVE_ZIP_PATH,

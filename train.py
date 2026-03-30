@@ -96,12 +96,13 @@ def find_dataset_root(search_root: Path) -> Path | None:
 
 
 def resolve_dataset_search_roots() -> list[Path]:
-    repo_root = Path(__file__).resolve().parent
     configured = [expand_path(CFG.LOCAL_DATASET_PATH)]
     configured.extend(
         expand_path(path) for path in getattr(CFG, "DATASET_SEARCH_ROOTS", ())
     )
-    configured.extend([repo_root, repo_root.parent])
+    # repo_root ve repo_root.parent kasitli kaldirildi:
+    # repo icindeki TIB_dataset gibi kalinti klasorler data.yaml icerir ve
+    # yanlis dataset olarak eslesebilir.
     return unique_paths(configured)
 
 
