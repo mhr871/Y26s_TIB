@@ -122,11 +122,8 @@ def resolve_zip_candidates() -> list[Path]:
     )
     configured.extend([
         repo_root / f"{dataset_name}.zip",
-        repo_root / "dataset.zip",
-        repo_root / "TIB_dataset.zip",
         repo_root.parent / f"{dataset_name}.zip",
         repo_root.parent / "dataset.zip",
-        repo_root.parent / "TIB_dataset.zip",
     ])
     return unique_paths(configured)
 
