@@ -101,7 +101,10 @@ def resolve_dataset_search_roots() -> list[Path]:
     configured.extend(
         expand_path(path) for path in getattr(CFG, "DATASET_SEARCH_ROOTS", ())
     )
-    configured.extend([repo_root, repo_root.parent])
+    # Colab'da repo agacini tarama: Drive'daki zip birincil kaynak.
+    # Repo agaci taramasi yalnizca lokal gelistirme icin kullanilir.
+    if not in_colab():
+        configured.extend([repo_root, repo_root.parent])
     return unique_paths(configured)
 
 
